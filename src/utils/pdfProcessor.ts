@@ -1,6 +1,5 @@
 // PDF processing utility
-// Note: pdf-parse is a Node.js module and won't work directly in the browser
-// For browser-based PDF processing, we'll use pdfjs-dist instead
+// Uses PDF.js library loaded via CDN for browser-based PDF text extraction
 
 export async function extractTextFromPDF(file: File): Promise<string> {
   try {
@@ -45,9 +44,9 @@ async function extractTextWithPDFJS(arrayBuffer: ArrayBuffer): Promise<string> {
 
     return fullText.trim()
   } catch (error) {
-    // Fallback: Return a message indicating manual text extraction needed
-    console.warn('PDF.js not available, using fallback')
-    return '请注意：由于浏览器限制，PDF文本提取功能受限。建议手动复制PDF内容或使用支持的PDF文件。'
+    // Fallback: Return a message indicating PDF.js is not available
+    console.warn('PDF.js not available:', error)
+    throw new Error('PDF.js未能成功加载。请刷新页面重试，或检查网络连接。')
   }
 }
 

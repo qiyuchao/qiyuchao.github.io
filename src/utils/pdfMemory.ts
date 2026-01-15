@@ -89,12 +89,13 @@ export async function deletePDF(id: string) {
 
 export async function storeConversation(pdfId: string, question: string, answer: string) {
   const database = await initDB()
-  await database.add('conversations', {
+  const conversation = {
     pdfId,
     question,
     answer,
     timestamp: Date.now(),
-  } as any)
+  }
+  await database.add('conversations', conversation)
 }
 
 export async function getConversations(pdfId: string) {
