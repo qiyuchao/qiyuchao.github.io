@@ -93,6 +93,11 @@
       "icon": "icon-flask"
     },
     {
+      "name": "PDF问答",
+      "link": "/pdf-qa",
+      "icon": "icon-file-text"
+    },
+    {
       "name": "关于",
       "link": "/about",
       "icon": "icon-ghost"
