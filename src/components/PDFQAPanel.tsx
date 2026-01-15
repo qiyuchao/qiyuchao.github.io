@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'react-toastify'
 import {
   storePDF,
   getAllPDFs,
@@ -83,7 +84,7 @@ export default function PDFQAPanel() {
     if (!file) return
 
     if (!validatePDFFile(file)) {
-      alert('请上传有效的PDF文件（最大10MB）')
+      toast.error('请上传有效的PDF文件（最大10MB）')
       return
     }
 
@@ -94,10 +95,10 @@ export default function PDFQAPanel() {
       await storePDF(id, file.name, text)
       await loadPDFs()
       setSelectedPDF(id)
-      alert('PDF上传成功！')
+      toast.success('PDF上传成功！')
     } catch (error) {
       console.error('Error uploading PDF:', error)
-      alert('PDF上传失败，请重试')
+      toast.error('PDF上传失败，请重试')
     } finally {
       setIsProcessing(false)
       if (fileInputRef.current) {
@@ -115,10 +116,10 @@ export default function PDFQAPanel() {
       if (selectedPDF === id) {
         setSelectedPDF(null)
       }
-      alert('PDF已删除')
+      toast.success('PDF已删除')
     } catch (error) {
       console.error('Error deleting PDF:', error)
-      alert('删除失败，请重试')
+      toast.error('删除失败，请重试')
     }
   }
 
@@ -129,7 +130,7 @@ export default function PDFQAPanel() {
     try {
       const pdf = await getPDF(selectedPDF)
       if (!pdf) {
-        alert('找不到选定的PDF')
+        toast.error('找不到选定的PDF')
         return
       }
 
@@ -141,7 +142,7 @@ export default function PDFQAPanel() {
       setQuestion('')
     } catch (error) {
       console.error('Error processing question:', error)
-      alert('处理问题时出错，请重试')
+      toast.error('处理问题时出错，请重试')
     } finally {
       setIsProcessing(false)
     }

@@ -22,11 +22,28 @@ export async function extractTextFromPDF(file: File): Promise<string> {
 }
 
 async function extractTextWithPDFJS(arrayBuffer: ArrayBuffer): Promise<string> {
-  // This is a placeholder for PDF.js integration
-  // In production, you would use pdfjs-dist library
+  // This uses PDF.js loaded via CDN
   try {
-    // Dynamic import for PDF.js (if available)
-    const pdfjsLib = (window as any).pdfjsLib
+    // Access PDF.js from window object
+    interface PDFJSLib {
+      getDocument: (params: { data: ArrayBuffer }) => { promise: Promise<PDFDocumentProxy> }
+      GlobalWorkerOptions: { workerSrc: string }
+    }
+
+    interface PDFDocumentProxy {
+      numPages: number
+      getPage: (pageNumber: number) => Promise<PDFPageProxy>
+    }
+
+    interface PDFPageProxy {
+      getTextContent: () => Promise<TextContent>
+    }
+
+    interface TextContent {
+      items: Array<{ str: string }>
+    }
+
+    const pdfjsLib = (window as typeof window & { pdfjsLib?: PDFJSLib }).pdfjsLib
 
     if (!pdfjsLib) {
       throw new Error('PDF.js not loaded')
@@ -38,7 +55,7 @@ async function extractTextWithPDFJS(arrayBuffer: ArrayBuffer): Promise<string> {
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i)
       const textContent = await page.getTextContent()
-      const pageText = textContent.items.map((item: any) => item.str).join(' ')
+      const pageText = textContent.items.map((item) => item.str).join(' ')
       fullText += pageText + '\n\n'
     }
 
