@@ -1,0 +1,97 @@
+---
+import type { CollectionEntry } from 'astro:content'
+import type { GetStaticPaths } from 'astro'
+import MarkdownLayout from '@/layouts/MarkdownLayout.astro'
+import { getCollection } from 'astro:content'
+import MarkdownWrapper from '@/components/MarkdownWrapper.astro'
+import SectionBlock from '@/components/SectionBlock.astro'
+import { PostToc } from '@/components/post/PostToc'
+import PostMetaInfo from '@/components/post/PostMetaInfo.astro'
+
+export const getStaticPaths = (async () => {
+  const knowledgeItems = await getCollection('knowledge')
+  const sortedItems = knowledgeItems.sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+  )
+
+  return sortedItems.map((item) => ({
+    params: { slug: item.slug },
+    props: {
+      current: item,
+    },
+  }))
+}) satisfies GetStaticPaths
+
+interface Props {
+  current: CollectionEntry<'knowledge'>
+}
+
+const { current } = Astro.props
+
+const { headings, Content, remarkPluginFrontmatter } = await current.render()
+
+const mdSlug = `/knowledge/${current.slug}`
+
+const mdDescription = [current.data.category, ...(current.data.tags || [])]
+  .filter(Boolean)
+  .join(', ')
+---
+
+<MarkdownLayout
+  title={current.data.title}
+  description={current.data.summary}
+  mdTitle={current.data.title}
+  mdDescription={mdDescription}
+  mdSlug={mdSlug}
+>
+  <div class="max-w-[1100px] mx-auto px-4 md:px-8 py-16 grid lg:grid-cols-[auto_260px] gap-8">
+    <div>
+      <header class="space-y-4">
+        <h1 class="text-4xl font-bold text-center">
+          {current.data.title}
+        </h1>
+        <PostMetaInfo
+          class="justify-center"
+          date={current.data.date}
+          lastMod={current.data.lastMod}
+          words={remarkPluginFrontmatter?.words}
+          readingMinutes={remarkPluginFrontmatter?.readingMinutes}
+        />
+        {
+          (current.data.category || current.data.tags?.length > 0) && (
+            <div class="flex flex-wrap gap-2 justify-center text-sm">
+              {current.data.category && (
+                <span class="px-3 py-1 bg-primary/10 rounded-full">
+                  {current.data.category}
+                </span>
+              )}
+              {current.data.tags?.map((tag) => (
+                <span class="px-3 py-1 bg-primary/10 rounded-full">#{tag}</span>
+              ))}
+            </div>
+          )
+        }
+      </header>
+    </div>
+    <div class="col-start-1 min-w-0">
+      <MarkdownWrapper>
+        <Content />
+      </MarkdownWrapper>
+    </div>
+    <div class="hidden lg:block">
+      <aside class="sticky top-20">
+        <SectionBlock title="目录">
+          <PostToc headings={headings} client:idle />
+        </SectionBlock>
+      </aside>
+    </div>
+    <div>
+      <a
+        href="/knowledge"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
+      >
+        ← 返回知识库
+      </a>
+    </div>
+  </div>
+</MarkdownLayout>
