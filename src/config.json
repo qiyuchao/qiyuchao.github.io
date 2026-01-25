@@ -88,6 +88,11 @@
       "icon": "icon-archive"
     },
     {
+      "name": "知识库",
+      "link": "/knowledge",
+      "icon": "icon-book"
+    },
+    {
       "name": "项目",
       "link": "/projects",
       "icon": "icon-flask"

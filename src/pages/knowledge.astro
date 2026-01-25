@@ -1,0 +1,42 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro'
+import Highlight from '@/components/Highlight.astro'
+import { getCollection } from 'astro:content'
+import { KnowledgeList, KnowledgeUpload, KnowledgeChat } from '@/components/knowledge'
+
+const knowledgeItems = await getCollection('knowledge')
+const sortedKnowledge = knowledgeItems.sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+)
+---
+
+<PageLayout title="知识库">
+  <div class="max-w-[1200px] mx-auto px-4 py-16">
+    <header class="space-y-4 mb-8">
+      <h1 class="text-4xl font-bold">
+        <Highlight>知识库</Highlight>
+      </h1>
+      <p>您的私人知识库，共有 {sortedKnowledge.length} 条知识</p>
+      <hr class="w-[100px] border-primary" />
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Left: Knowledge List -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-2xl font-semibold">知识条目</h2>
+          <KnowledgeUpload client:load />
+        </div>
+        <KnowledgeList items={sortedKnowledge} client:load />
+      </div>
+
+      <!-- Right: Chat Interface -->
+      <div class="lg:col-span-1">
+        <div class="sticky top-4">
+          <h2 class="text-2xl font-semibold mb-4">问答助手</h2>
+          <KnowledgeChat client:load />
+        </div>
+      </div>
+    </div>
+  </div>
+</PageLayout>
