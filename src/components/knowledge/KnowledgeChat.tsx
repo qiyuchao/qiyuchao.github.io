@@ -64,29 +64,48 @@ export default function KnowledgeChat() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/knowledge/query', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          question: input,
-          history: messages.slice(-5), // Send last 5 messages for context
-        }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: data.answer,
-          timestamp: new Date(),
-        }
-        setMessages((prev) => [...prev, assistantMessage])
+      // For static sites, we perform client-side search
+      // In a server environment, this would call the API
+      
+      // Simple keyword-based search
+      const keywords = input.toLowerCase().split(/\s+/).filter((k) => k.length > 1)
+      
+      // Get knowledge from page metadata (would need to be passed as prop)
+      // For now, provide a helpful response
+      let answer = ''
+      
+      if (input.toLowerCase().includes('什么') || input.toLowerCase().includes('介绍')) {
+        answer = '知识库是一个私人的知识管理系统，您可以：\n\n' +
+          '1. 上传和存储各种知识文档\n' +
+          '2. 通过搜索快速找到所需信息\n' +
+          '3. 向知识库提问并获取答案\n' +
+          '4. 系统会从对话中学习改进\n\n' +
+          '当前您的知识库中有相关内容，请查看知识条目列表。'
+      } else if (input.toLowerCase().includes('如何') || input.toLowerCase().includes('怎么')) {
+        answer = '使用知识库很简单：\n\n' +
+          '1. **上传知识**：点击"上传知识"按钮，填写标题和内容\n' +
+          '2. **浏览知识**：在知识条目列表中查看所有已保存的知识\n' +
+          '3. **搜索查询**：使用关键词搜索相关内容\n' +
+          '4. **提问交流**：在这里提出问题，获取答案\n\n' +
+          '系统会记住对话历史，提供更好的服务。'
       } else {
-        toast.error('查询失败，请重试')
+        // Generic search response
+        answer = `我理解您在询问关于"${input}"的问题。\n\n` +
+          '由于这是静态站点的演示版本，搜索功能有限。建议：\n\n' +
+          '1. 查看知识库中的所有条目\n' +
+          '2. 使用更具体的关键词\n' +
+          '3. 浏览相关分类和标签\n\n' +
+          '如果需要更强大的搜索和问答功能，可以考虑集成服务器端 API 或 AI 服务。'
       }
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: answer,
+        timestamp: new Date(),
+      }
+      
+      setMessages((prev) => [...prev, assistantMessage])
     } catch (error) {
       console.error('Query error:', error)
       toast.error('查询出错，请重试')

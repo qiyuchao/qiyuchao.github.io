@@ -3,11 +3,6 @@ import { getCollection } from 'astro:content'
 import fs from 'fs/promises'
 import path from 'path'
 
-interface Message {
-  role: 'user' | 'assistant'
-  content: string
-}
-
 export const POST: APIRoute = async ({ request }) => {
   try {
     const { question, history = [] } = await request.json()
@@ -29,10 +24,10 @@ export const POST: APIRoute = async ({ request }) => {
     const relevantItems = knowledgeItems
       .map((item) => {
         const titleMatch = keywords.filter((k: string) =>
-          item.data.title.toLowerCase().includes(k)
+          item.data.title.toLowerCase().includes(k),
         ).length
         const summaryMatch = keywords.filter(
-          (k: string) => item.data.summary?.toLowerCase().includes(k) || false
+          (k: string) => item.data.summary?.toLowerCase().includes(k) || false,
         ).length
 
         // Calculate relevance score
@@ -64,8 +59,7 @@ export const POST: APIRoute = async ({ request }) => {
         answer += `\n详细信息请查看：[${item.data.title}](/knowledge/${item.slug})\n\n`
       }
 
-      answer +=
-        '如果这些信息不能完全回答您的问题，请尝试更具体的提问或查看详细内容。'
+      answer += '如果这些信息不能完全回答您的问题，请尝试更具体的提问或查看详细内容。'
     }
 
     // Save conversation for learning (in production, this could be saved to a database)
@@ -75,7 +69,7 @@ export const POST: APIRoute = async ({ request }) => {
 
       const conversationFile = path.join(
         conversationDir,
-        `${new Date().toISOString().split('T')[0]}.jsonl`
+        `${new Date().toISOString().split('T')[0]}.jsonl`,
       )
 
       const conversationEntry = JSON.stringify({
@@ -106,7 +100,7 @@ export const POST: APIRoute = async ({ request }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     )
   } catch (error) {
     console.error('Query error:', error)

@@ -20,35 +20,67 @@ export default function KnowledgeUpload() {
     setUploading(true)
 
     try {
-      const response = await fetch('/api/knowledge/upload', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title,
-          content,
-          category,
-          tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
-        }),
+      // For static sites, we'll save to localStorage as a workaround
+      // In production with a server, this would call the API
+      const slug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .substring(0, 50) || `knowledge-${Date.now()}`
+
+      const frontmatter = {
+        title,
+        date: new Date().toISOString().split('T')[0],
+        summary: content.substring(0, 100),
+        ...(category && { category }),
+        ...(tags && tags.length > 0 && { tags }),
+      }
+
+      const frontmatterLines = Object.entries(frontmatter).map(([key, value]) => {
+        if (Array.isArray(value)) {
+          return `${key}: [${value.map((v) => `"${v}"`).join(', ')}]`
+        }
+        return `${key}: "${value}"`
       })
 
-      if (response.ok) {
-        toast.success('知识上传成功！页面将刷新...')
-        setTitle('')
-        setContent('')
-        setCategory('')
-        setTags('')
-        setIsOpen(false)
-        // Reload page to show new knowledge
-        setTimeout(() => window.location.reload(), 1000)
-      } else {
-        const error = await response.text()
-        toast.error(`上传失败: ${error}`)
-      }
+      const fileContent = `---
+${frontmatterLines.join('\n')}
+---
+
+${content}
+`
+
+      // Save to localStorage for demo purposes
+      const savedKnowledge = JSON.parse(localStorage.getItem('uploaded-knowledge') || '[]')
+      savedKnowledge.push({
+        slug,
+        title,
+        content: fileContent,
+        timestamp: Date.now(),
+      })
+      localStorage.setItem('uploaded-knowledge', JSON.stringify(savedKnowledge))
+
+      toast.success('知识已保存到本地存储！请下载文件并手动添加到 src/content/knowledge/ 目录')
+      
+      // Create download link
+      const blob = new Blob([fileContent], { type: 'text/markdown' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${slug}.md`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+
+      setTitle('')
+      setContent('')
+      setCategory('')
+      setTags('')
+      setIsOpen(false)
     } catch (error) {
-      console.error('Upload error:', error)
-      toast.error('上传失败，请重试')
+      console.error('Save error:', error)
+      toast.error('保存失败，请重试')
     } finally {
       setUploading(false)
     }
