@@ -67,11 +67,6 @@ export default function KnowledgeChat() {
       // For static sites, we perform client-side search
       // In a server environment, this would call the API
       
-      // Simple keyword-based search
-      const keywords = input.toLowerCase().split(/\s+/).filter((k) => k.length > 1)
-      
-      // Get knowledge from page metadata (would need to be passed as prop)
-      // For now, provide a helpful response
       let answer = ''
       
       if (input.toLowerCase().includes('什么') || input.toLowerCase().includes('介绍')) {

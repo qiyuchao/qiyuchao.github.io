@@ -28,12 +28,15 @@ export default function KnowledgeUpload() {
         .replace(/^-+|-+$/g, '')
         .substring(0, 50) || `knowledge-${Date.now()}`
 
+      // Parse tags into array
+      const tagsArray = tags.split(',').map((t) => t.trim()).filter(Boolean)
+
       const frontmatter = {
         title,
         date: new Date().toISOString().split('T')[0],
         summary: content.substring(0, 100),
         ...(category && { category }),
-        ...(tags && tags.length > 0 && { tags }),
+        ...(tagsArray.length > 0 && { tags: tagsArray }),
       }
 
       const frontmatterLines = Object.entries(frontmatter).map(([key, value]) => {
