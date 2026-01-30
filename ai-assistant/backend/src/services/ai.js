@@ -76,7 +76,7 @@ class AIService {
 
       throw new Error('Invalid response from AI API');
     } catch (error) {
-      console.error('AI API Error:', error.response?.data || error.message);
+      console.error('AI API Error:', error.response?.status, error.message);
 
       // 如果是API错误，提供友好的错误信息
       if (error.response?.status === 401) {

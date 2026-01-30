@@ -20,9 +20,9 @@ router.get('/', (req, res) => {
       messagesToday: db
         .prepare(
           `SELECT COUNT(*) as count FROM messages 
-           WHERE created_at >= strftime('%s', 'now', 'start of day')`
+           WHERE created_at >= ?`
         )
-        .get().count,
+        .get(Math.floor(Date.now() / 1000) - 86400).count,
     };
 
     res.json(stats);

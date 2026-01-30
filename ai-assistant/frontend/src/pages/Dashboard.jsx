@@ -42,24 +42,32 @@ function Dashboard() {
       value: stats?.conversations || 0,
       icon: MessageSquare,
       color: 'blue',
+      bgClass: 'bg-blue-100',
+      textClass: 'text-blue-600',
     },
     {
       title: '消息总数',
       value: stats?.messages || 0,
       icon: TrendingUp,
       color: 'green',
+      bgClass: 'bg-green-100',
+      textClass: 'text-green-600',
     },
     {
       title: '文档总数',
       value: stats?.documents || 0,
       icon: FileText,
       color: 'purple',
+      bgClass: 'bg-purple-100',
+      textClass: 'text-purple-600',
     },
     {
       title: '今日消息',
       value: stats?.messagesToday || 0,
       icon: Clock,
       color: 'orange',
+      bgClass: 'bg-orange-100',
+      textClass: 'text-orange-600',
     },
   ];
 
@@ -84,8 +92,8 @@ function Dashboard() {
                 <p className="text-sm text-gray-500">{card.title}</p>
                 <p className="text-3xl font-bold text-gray-800 mt-2">{card.value}</p>
               </div>
-              <div className={`p-3 rounded-lg bg-${card.color}-100`}>
-                <card.icon className={`text-${card.color}-600`} size={24} />
+              <div className={`p-3 rounded-lg ${card.bgClass}`}>
+                <card.icon className={card.textClass} size={24} />
               </div>
             </div>
           </div>
