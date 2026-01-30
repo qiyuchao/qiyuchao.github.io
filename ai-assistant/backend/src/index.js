@@ -81,7 +81,7 @@ db.exec(`
 const defaultSettings = {
   ai_provider: process.env.AI_PROVIDER || 'iflow',
   ai_model: 'gpt-3.5-turbo',
-  telegram_enabled: process.env.TELEGRAM_ENABLED === 'true',
+  telegram_enabled: process.env.TELEGRAM_ENABLED === 'true' ? 'true' : 'false',
   max_context_messages: '10',
   system_prompt:
     '你是一个智能的个人助理，可以学习用户的对话历史和上传的文档。请尽可能提供有帮助、准确和友好的回答。',
